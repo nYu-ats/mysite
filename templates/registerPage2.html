@@ -1,0 +1,35 @@
+{% load static %}
+<html lang="ja">
+<head>
+<meta name="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="discription" content="Python-portfolio">
+<title>ネガポジ日記</title>
+<link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+  <header>
+    <div class="header">
+      <p>nega/posi diary</p>
+    </div>
+    </header>
+
+  <main>
+    <div class="register_discription">
+      <p>新規ユーザー登録には、下記2点の情報をご入力ください</p>
+      <p>メールアドレス</p>
+      <p>パスワード<半角英数字5~8文字以上></p>
+      <font color="red">正しいメールアドレスとパスワードを入力してください</font>
+    </div>
+    <div class="register_form">
+      <p>Register</p>
+      <form class="" action="#" method="post">
+        <input class="input_username" type="email" name="email" placeholder="Username" required="required">
+        <input class="input_password" type="password" name="password" placeholder="Password" required="required">
+        <input class="input_submit" type="submit" value="Register">
+        {% csrf_token %}
+      </form>
+    </div>
+  </main>
+  <footer><div class="footer"></div></footer>
+</body>

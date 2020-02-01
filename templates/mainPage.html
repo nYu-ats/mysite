@@ -1,0 +1,174 @@
+{% load static %}
+<html lang="ja">
+<head>
+<meta name="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="discription" content="Python-portfolio">
+<title>ネガポジ日記</title>
+<link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+<script type="text/javascript" src="{% static 'js/jquery-3.4.1.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/main.js' %}"></script>
+<script type="text/javascript" src="{% static 'js/Chart.bundle.js' %}"></script>
+</head>
+<body>
+  <header>
+    <div class="header">
+      <p>PosiNega Diary</p>
+    </div>
+    <div class="logout_button">
+      <a href="logout/" >Logout</a>
+    </div>
+  </header>
+  <main>
+    <div class="diary_open">
+      <a href="#">Open Diary</a>
+      <script type="text/javascript">
+        $(function(){
+          var height = $('div.choice_area').outerHeight(true)+$('div.flex').outerHeight(true)+$('div.line_chart').outerHeight(true);
+          var duaration=400;
+          var $diary=$('div.write_diary');
+          var $openButton=$('div.diary_open a');
+          var $closeButton=$('div.diary_close a');
+          var $noDisplay1 = $('div.diary_open');
+          var $noDisplay2 = $('div.main_contents');
+          var $heightSet = $diary.outerHeight(height);
+          var $openAction=$openButton.on('click', function(event){
+            event.preventDefault();
+            $diary.stop(true).animate({
+              left:'0'
+            },duaration);
+            $noDisplay1.toggleClass('hidden');
+            $noDisplay2.toggleClass('hidden');
+          });
+          var $closeAction=$closeButton.on('click',function(event){
+            event.preventDefault();
+            $diary.stop(true).animate({
+              left:'-100%'
+            },duaration);
+            $noDisplay1.toggleClass('hidden');
+            $noDisplay2.toggleClass('hidden');
+          });
+        });
+      </script>
+    </div>
+    <div class="write_diary">
+      <div class="diary_close">
+        <a href="#">Close Diary</a>
+      </div>
+      <h2>Write Diary</h2>
+      <form class="new_diary" action="#" method="post">
+        <div name='user'>{{user}}</div>
+        <textarea class="diary_area" required="required" name="diary">
+          {{diary}}
+        </textarea>
+        <input class="add_diary" type="submit" value="Add">
+        {% csrf_token %}
+      </form>
+    </div>
+    <div class="main_contents">
+      <div class="choice_area">
+    <form class="choice_date" action="/diary/choice/?user={{user}}" method="post">
+      <div name='user2' ?user=nyu%40gmail.com#>{{user}}</div>
+      <select class="year" name="year" >
+        {% for data in data_set %}
+        <option value="{{ data.0 }}/{{data.1}}/{{data.2}}" name="choice_date">{{ data.0 }}年{{data.1}}月{{data.2}}日</option>
+        {% endfor %}
+      </select>
+
+      <input type="submit" class="choice_button" value="Select">
+      {% csrf_token %}
+    </form>
+  </div>
+  <div class="flex">
+  <div class="diary_display">
+    <p>{{insert_year}}/{{insert_month}}/{{insert_day}}</p>
+    <p>{{diary}}</p>
+  </div>
+  <div class="circle_chart">
+    <canvas id="canvas_circle" value={{positive}},{{negative}}></canvas>
+    <script type="text/javascript" >
+      var canvas1=document.getElementById("canvas_circle");
+      var negaPosi=canvas1.getAttribute("value").split(',');
+      var positive=Number(negaPosi[0]);
+      var negative=Number(negaPosi[1]);
+      var PieChart = new Chart(canvas1,{
+        type:'pie',
+        data:{
+        labels:["positive","negative"],
+        datasets:[{
+          backgroundColor:[
+            "#ff7f50",
+            "#6495ed"
+          ],
+          data:[positive,negative]
+        }]
+      },
+    options:{
+      title:{
+        display:true,
+        text:'Posi/Nega'
+      }
+    }
+    });
+    </script>
+  </div>
+</div>
+  <div class="line_chart">
+    <canvas id="canvas_line" style="position:static; width:100%; height:360px;" ></canvas>
+    <script type="text/javascript">
+    var canvas2 = document.getElementById("canvas_line");
+    var labelData = [];
+    var positiveData = [];
+    var negativeData =[];
+    {% for data in data_set%}
+      labelData.unshift({{ data.1 }}+'月'+{{ data.2 }}+'日');
+      positiveData.unshift({{ data.3 }});
+      negativeData.unshift({{ data.4 }});
+    {% endfor %}
+  var LineChart = new Chart(canvas2, {
+    type:'line',
+    data:{
+      labels:labelData,
+      datasets:[
+        {
+        label:'positive',
+        data:positiveData,
+        borderColor:"#ff7f50",
+        backgroundColor:"#ff7f50"
+      },
+      {
+        label:'negative',
+        data:negativeData,
+        borderColor:"#6495ed",
+        backgroundColor:"#6495ed"
+      }
+    ],
+  },
+  options:{
+    title:{
+      display:true,
+      text:'Posi/Nega 推移'
+    },
+    scales:{
+      yAxes:[{
+        ticks:{
+          suggestedMax:100,
+          suggestedMin:0,
+          stepSize:10,
+          callback: function(value,index,values){
+            return value + '%'
+          }
+        }
+      }]
+    },
+  }
+});
+
+    </script>
+  </div>
+  </div>
+  </main>
+
+
+</body>
+</html>
